@@ -7,7 +7,7 @@ import android.view.MenuItem;
 
 import java.io.File;
 
-public class MainActivity extends Activity implements GraphicsSurfaceChangedListener, UserInputListener
+public class MainActivity extends Activity implements GraphicsSurfaceChangedListener
 {
    private GameGLSurface mGLView;
    private CardMediator mediator = null;
@@ -64,8 +64,10 @@ public class MainActivity extends Activity implements GraphicsSurfaceChangedList
          case R.id.action_deal:
             if (mediator != null)
             {
+               if (invoker != null)
+                  mGLView.getGraphicsInterface().delExecGraphicsCommandListener(invoker);
                invoker = new CardCommandInvoker(mGLView.getGraphicsInterface(), gameStateFileName);
-               mediator.newGame();
+               mediator.newGame(invoker);
             }
             return true;
          default:
@@ -85,16 +87,6 @@ public class MainActivity extends Activity implements GraphicsSurfaceChangedList
 
       if (!invoker.restoreState(mediator))
          mediator.deal();
-   }
-
-   @Override
-   public boolean touchEvent (int _type, int _param, float _posX, float _posY)
-   {
-//      if (mediator != null)
-//         return mediator.processTouch(_type, _param, _posX, _posY);
-//      else
-//         return false;
-      return false;
    }
 
    @Override

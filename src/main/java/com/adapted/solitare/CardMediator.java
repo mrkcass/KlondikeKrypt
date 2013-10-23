@@ -209,10 +209,9 @@ public class CardMediator  implements Mediator
       cc.moveTo(pos_x, pos_y);
    }
 
-   public void newGame ()
+   public void newGame (CardCommandInvoker _invoker)
    {
-      if (invoker != null)
-         graphics.delExecGraphicsCommandListener(invoker);
+      invoker = _invoker;
       components = new RootPile(this, graphics);
       msgPool.clear();
 
