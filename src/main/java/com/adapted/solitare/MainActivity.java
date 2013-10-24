@@ -68,6 +68,11 @@ public class MainActivity extends Activity implements GraphicsSurfaceChangedList
                   mGLView.getGraphicsInterface().delExecGraphicsCommandListener(invoker);
                invoker = new CardCommandInvoker(mGLView.getGraphicsInterface(), gameStateFileName);
                mediator.newGame(invoker);
+               if (player != null)
+                  mGLView.InputListenerRemove((PlayerReal)player);
+               PlayerReal realPlayer = new PlayerReal(mediator.GetRoot(), invoker);
+               mGLView.InputListenerAdd(realPlayer);
+               player = realPlayer;
             }
             return true;
          default:
@@ -78,11 +83,15 @@ public class MainActivity extends Activity implements GraphicsSurfaceChangedList
    @Override
    public void surfaceChanged ()
    {
+      if (invoker != null)
+         mGLView.getGraphicsInterface().delExecGraphicsCommandListener(invoker);
       invoker = new CardCommandInvoker(mGLView.getGraphicsInterface(), gameStateFileName);
       mediator = new CardMediator(mGLView.getGraphicsInterface(), invoker);
 
-      RealPlayer realPlayer = new RealPlayer(mediator.GetRoot(), invoker);
-      mGLView.addInputListener(realPlayer);
+      if (player != null)
+         mGLView.InputListenerRemove((PlayerReal)player);
+      PlayerReal realPlayer = new PlayerReal(mediator.GetRoot(), invoker);
+      mGLView.InputListenerAdd(realPlayer);
       player = realPlayer;
 
       if (!invoker.restoreState(mediator))

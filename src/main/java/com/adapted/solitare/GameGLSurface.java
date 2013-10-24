@@ -171,9 +171,14 @@ public class GameGLSurface extends GLSurfaceView
       dragTask.pause();
    }
 
-   public void addInputListener (UserInputListener _listener)
+   public void InputListenerAdd(UserInputListener _listener)
    {
       inputListeners.add (_listener);
+   }
+
+   public void InputListenerRemove (UserInputListener _listener)
+   {
+      inputListeners.remove (_listener);
    }
 }
 

@@ -54,6 +54,13 @@ class CardComponentId
       bytes[2] = b3;
    }
 
+   void set (CardComponentId _src)
+   {
+      bytes[0] = _src.bytes[0];
+      bytes[1] = _src.bytes[1];
+      bytes[2] = _src.bytes[2];
+   }
+
    boolean equals (CardComponentId _cmp)
    {
       if (_cmp.bytes[0] == bytes[0] && _cmp.bytes[1] == bytes[1] && _cmp.bytes[2] == bytes[2])

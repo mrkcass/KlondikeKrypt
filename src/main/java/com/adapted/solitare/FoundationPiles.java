@@ -307,13 +307,12 @@ class Foundation extends CardColleagueComposite
          tf = (PlaylistFilterTouch)filter;
          CardColleague cc = findTouched(tf.x, tf.y);
          if (cc != null)
-            list.client = cc;
+            list.AddPlay(cc, Const.PlayFilterType.PFT_TOUCH_PLAYABLE, id, id);
       }
       else if (filter.type == Const.PlayFilterType.PFT_TOUCH)
       {
          tf = (PlaylistFilterTouch)filter;
          processUserInput(tf.touchType, tf.touchParam, tf.x, tf.y);
-         list.client = this;
       }
 
       return 1;
