@@ -5,18 +5,18 @@ import java.util.ArrayList;
 /**
  * Created by mark on 6/8/13.
  */
-public abstract class CardColleague extends Colleague implements CardComponent, CardCommandReceiver, CardColleagueVistable, PlayerClient
+public abstract class Playable extends Colleague implements CardComponent, CardCommandReceiver, CardColleagueVistable, PlayerClient
 {
    public GraphicsInterface graphics;
    public CardComponentId id;
 
-   CardColleague (Mediator _mediator, GraphicsInterface _graphics)
+   Playable(Mediator _mediator, GraphicsInterface _graphics)
    {
       super (_mediator);
       graphics = _graphics;
    }
 
-   CardColleague (CardColleague _colleague)
+   Playable(Playable _colleague)
    {
       super (_colleague);
       graphics = _colleague.graphics;
@@ -71,11 +71,6 @@ public abstract class CardColleague extends Colleague implements CardComponent, 
    }
 
    @Override
-   public void setZorderOffset(int _offset)
-   {
-   }
-
-   @Override
    public void show(boolean _show)
    {
    }
@@ -91,9 +86,9 @@ public abstract class CardColleague extends Colleague implements CardComponent, 
    }
 
    @Override
-   public CardColleague find (CardComponentId _id)
+   public Playable find (CardComponentId _id)
    {
-      CardColleague found = null;
+      Playable found = null;
 
       if (id.equals(_id))
          found = this;
@@ -102,7 +97,7 @@ public abstract class CardColleague extends Colleague implements CardComponent, 
    }
 
    @Override
-   public CardColleague findTouched (float _posX, float _posY)
+   public Playable findTouched (float _posX, float _posY)
    {
       return null;
    }
@@ -112,6 +107,12 @@ public abstract class CardColleague extends Colleague implements CardComponent, 
    {
       return 0;
    }
+
+   @Override
+   public CardCommandReceiver GetCommandReceiver (CardComponentId id)
+   {
+      return find (id);
+   }
 }
 
 
@@ -119,20 +120,20 @@ public abstract class CardColleague extends Colleague implements CardComponent, 
 //======================================================================================================================
 //======================================================================================================================
 //======================================================================================================================
-abstract class CardColleagueComposite extends CardColleague
+abstract class PlayableComposite extends Playable
 {
-   ArrayList<CardColleague> components;
+   ArrayList<Playable> components;
 
-   CardColleagueComposite (Mediator _mediator, GraphicsInterface _graphics)
+   PlayableComposite(Mediator _mediator, GraphicsInterface _graphics)
    {
       super (_mediator, _graphics);
-      components = new ArrayList<CardColleague>();
+      components = new ArrayList<Playable>();
    }
 
-   CardColleagueComposite (CardColleague _colleague)
+   PlayableComposite(Playable _colleague)
    {
       super (_colleague);
-      components = new ArrayList<CardColleague>();
+      components = new ArrayList<Playable>();
    }
 
    @Override
@@ -153,9 +154,9 @@ abstract class CardColleagueComposite extends CardColleague
    }
 
    @Override
-   public CardColleague find (CardComponentId _id)
+   public Playable find (CardComponentId _id)
    {
-      CardColleague found = null;
+      Playable found = null;
 
       if (id.equals(_id))
       {
@@ -176,9 +177,9 @@ abstract class CardColleagueComposite extends CardColleague
    }
 
    @Override
-   public CardColleague findTouched (float _posX, float _posY)
+   public Playable findTouched (float _posX, float _posY)
    {
-      CardColleague found = null;
+      Playable found = null;
       int len = components.size();
       for (int i = 0; i < len; i++)
       {
@@ -192,42 +193,42 @@ abstract class CardColleagueComposite extends CardColleague
    @Override
    public void setOrientationLandscape()
    {
-      for (CardColleague comp : components)
+      for (Playable comp : components)
          comp.setOrientationLandscape();
    }
 
    @Override
    public void setOrientationPortrait()
    {
-      for (CardColleague comp : components)
+      for (Playable comp : components)
          comp.setOrientationPortrait();
    }
 
    @Override
    public void moveTo (float _x, float _y)
    {
-      for (CardColleague cc : components)
+      for (Playable cc : components)
          cc.moveTo(_x, _y);
    }
 
    @Override
    public void move(float _dx, float _dy)
    {
-      for (CardColleague cc : components)
+      for (Playable cc : components)
          cc.move(_dx, _dy);
    }
 
    @Override
    public void show (boolean _show)
    {
-      for (CardColleague cc : components)
+      for (Playable cc : components)
         cc.show(_show);
    }
 
    @Override
    public int GetPlaylist (Playlist list, PlaylistFilter filter)
    {
-      for (CardColleague cc : components)
+      for (Playable cc : components)
          cc.GetPlaylist(list, filter);
       return 1;
    }

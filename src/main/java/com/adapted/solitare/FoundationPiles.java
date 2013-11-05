@@ -1,11 +1,9 @@
 package com.adapted.solitare;
 
-import java.util.ArrayList;
-
 /**
  * Created by mark on 6/8/13.
  */
-public class FoundationPiles extends CardColleagueComposite
+public class FoundationPiles extends PlayableComposite
 {
    private final int numFoundations = 4;
    private boolean portrait = true;
@@ -43,7 +41,7 @@ public class FoundationPiles extends CardColleagueComposite
          float dist_to_next_card = graphics.cardWidth() + (graphics.cardWidth()*.1f);
          float x = _x;
 
-         for (CardColleague cc : components)
+         for (Playable cc : components)
          {
             cc.moveTo(x, _y);
             x += dist_to_next_card;
@@ -112,7 +110,7 @@ public class FoundationPiles extends CardColleagueComposite
 //======================================================================================================================
 //======================================================================================================================
 //======================================================================================================================
-class Foundation extends CardColleagueComposite
+class Foundation extends PlayableComposite
 {
    private static final String baseName = "foundation";
    private float posX, posY;
@@ -177,6 +175,19 @@ class Foundation extends CardColleagueComposite
          }
       }
       return 0;
+   }
+
+   public static int indexFromId (CardComponentId id)
+   {
+      return id.bytes[1];
+   }
+
+   public static boolean isFoundationId (CardComponentId id)
+   {
+      if (id.bytes[0] == Const.MediatorType.FOUNDATION)
+         return true;
+      else
+         return false;
    }
 
    @Override
@@ -305,7 +316,7 @@ class Foundation extends CardColleagueComposite
       if (filter.type == Const.PlayFilterType.PFT_TOUCH_PLAYABLE)
       {
          tf = (PlaylistFilterTouch)filter;
-         CardColleague cc = findTouched(tf.x, tf.y);
+         Playable cc = findTouched(tf.x, tf.y);
          if (cc != null)
             list.AddPlay(cc, Const.PlayFilterType.PFT_TOUCH_PLAYABLE, id, id);
       }
@@ -319,7 +330,7 @@ class Foundation extends CardColleagueComposite
    }
 
    @Override
-   public CardColleague findTouched (float _posX, float _posY)
+   public Playable findTouched (float _posX, float _posY)
    {
       boolean touched = false;
 

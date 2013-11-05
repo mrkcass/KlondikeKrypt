@@ -1,12 +1,11 @@
 package com.adapted.solitare;
 
-import java.util.ArrayList;
 import java.util.Collections;
 
 /**
  * Created by mark on 6/6/13.
  */
-public class TableauPiles extends CardColleagueComposite
+public class TableauPiles extends PlayableComposite
 {
    private final int num_tableau = 7;
    private final int tableau_sizes[] = {1, 2, 3, 4, 5, 6, 7};
@@ -72,7 +71,7 @@ public class TableauPiles extends CardColleagueComposite
       float dist_to_next_card = graphics.cardWidth() + (graphics.cardWidth()*.1f);
       float x = _x;
 
-      for (CardColleague cc : components)
+      for (Playable cc : components)
       {
          cc.moveTo(x, _y);
          x += dist_to_next_card;
@@ -96,7 +95,7 @@ public class TableauPiles extends CardColleagueComposite
       float max_height = 0;
       float h;
 
-      for (CardColleague tab : components)
+      for (Playable tab : components)
       {
          h = tab.height();
          if (h > max_height)
@@ -161,7 +160,7 @@ public class TableauPiles extends CardColleagueComposite
 //======================================================================================================================
 //======================================================================================================================
 //======================================================================================================================
-class Tableau extends CardColleagueComposite
+class Tableau extends PlayableComposite
 {
    byte index;
    int maxCards;
@@ -284,7 +283,7 @@ class Tableau extends CardColleagueComposite
       posX = _x;
       posY = _y;
 
-      for (CardColleague crd : components)
+      for (Playable crd : components)
       {
          crd.moveTo(posX, posY + offset);
          offset += cardOffset;
@@ -302,6 +301,19 @@ class Tableau extends CardColleagueComposite
    public float height ()
    {
       return graphics.cardHeight() + (cardOffset * components.size());
+   }
+
+   public static int indexFromId (CardComponentId id)
+   {
+      return id.bytes[1];
+   }
+
+   public static boolean isTableauId (CardComponentId id)
+   {
+      if (id.bytes[0] == Const.MediatorType.TABLEAU)
+         return true;
+      else
+         return false;
    }
 
    @Override
@@ -613,21 +625,27 @@ class Tableau extends CardColleagueComposite
       if (filter.type == Const.PlayFilterType.PFT_TOUCH_PLAYABLE)
       {
          tf = (PlaylistFilterTouch)filter;
-         CardColleague cc = findTouched(tf.x, tf.y);
+         Playable cc = findTouched(tf.x, tf.y);
          if (cc != null)
             list.AddPlay(cc, Const.PlayFilterType.PFT_TOUCH_PLAYABLE, id, id);
       }
       else if (filter.type == Const.PlayFilterType.PFT_TOUCH)
       {
          tf = (PlaylistFilterTouch)filter;
-         processUserInput(tf.touchType, tf.touchParam, tf.x, tf.y);
+         if (components.size() > 0)
+         {
+            if (tf.touchType == Const.InputType.TOUCH)
+               processTouch (list);
+         }
+         else
+            processUserInput(tf.touchType, tf.touchParam, tf.x, tf.y);
       }
 
       return 1;
    }
 
    @Override
-   public CardColleague findTouched (float _posX, float _posY)
+   public Playable findTouched (float _posX, float _posY)
    {
       boolean touched = false;
 
@@ -653,9 +671,7 @@ class Tableau extends CardColleagueComposite
    {
       if (components.size() > 0)
       {
-         if (_type == Const.InputType.TOUCH)
-            processTouch ();
-         else if (_type == Const.InputType.DRAG_START && dragCard == null)
+         if (_type == Const.InputType.DRAG_START && dragCard == null)
             processDragStart (_param, _posX, _posY);
          else if (_type == Const.InputType.DRAG && dragCard != null)
             processDrag (_param, _posX, _posY);
@@ -664,7 +680,7 @@ class Tableau extends CardColleagueComposite
       }
    }
 
-   private void processTouch ()
+   private void processTouch (Playlist playlist)
    {
       MMsg possible_msg = acquireMsg();
 
@@ -689,96 +705,22 @@ class Tableau extends CardColleagueComposite
          rsp = sendMsg(possible_msg);
          if (rsp.fieldCount > 0)
          {
-            int highest_tab_fld = -1;
-            int highest_tab_index = -1;
-            int this_tab_index = index;
-            int next_least_tab_idx = -1;
-            int next_least_tab_fld = -1;
-            int least_foundation_idx = -1;
-            int least_tab_idx = -1;
-            int least_tab_fld = -1;
-            int foundation_fld = -1;
-
-            for (int idx=1; idx < rsp.fieldCount; idx+=2)
+            for (int rsp_idx=1; rsp_idx < rsp.fieldCount; rsp_idx+=2)
             {
-               if (MMsg.subfieldByte(rsp, idx, 0) == Const.MediatorType.TABLEAU)
+               if (rsp_idx == 1)
                {
-                  int tindex = MMsg.subfieldByte(rsp, idx, 1);
-                  if (tindex < this_tab_index && tindex > next_least_tab_idx)
+                  playlist.AddPlay(this, 1, id,  new CardComponentId(rsp.bytes, rsp.fieldStartIdx[rsp_idx]));
+                  for (int card_idx = pile_idx; card_idx < components.size(); card_idx++)
                   {
-                     next_least_tab_idx = tindex;
-                     next_least_tab_fld = idx;
+                     Card card = (Card)components.get(card_idx);
+                     playlist.AddCard(card.suit, card.rank);
                   }
-
-                  if (tindex > highest_tab_index)
-                  {
-                     highest_tab_index = tindex;
-                     highest_tab_fld = idx;
-                  }
-
-                  if (least_tab_idx == -1 || tindex < least_tab_idx)
-                  {
-                     least_tab_idx = tindex;
-                     least_tab_fld = idx;
-                  }
-               }
-               else if (MMsg.subfieldByte(rsp, idx, 0) == Const.MediatorType.FOUNDATION)
-               {
-                  int findex = MMsg.subfieldByte(rsp, idx, 1);
-                  if (least_foundation_idx == -1 || findex < least_foundation_idx)
-                  {
-                     least_foundation_idx = findex;
-                     foundation_fld = idx;
-                  }
-               }
-            }
-
-
-            int move_to_fld = -1;
-            if (pile_idx == 0 && card_rank_idx == Const.Rank.KING && foundation_fld == -1)
-            {
-               if (least_tab_idx < this_tab_index)
-                  move_to_fld = least_tab_fld;
-            }
-            else if (next_least_tab_fld != -1)
-               move_to_fld = next_least_tab_fld;
-            else if (foundation_fld != -1)
-               move_to_fld = foundation_fld;
-            else if (highest_tab_fld != -1)
-               move_to_fld = highest_tab_fld;
-
-            if (move_to_fld != -1)
-            {
-               MMsg move_msg = acquireMsg();
-               MMsg move_rsp;
-               CardComponentId move_to_id = new CardComponentId(rsp.bytes, rsp.fieldStartIdx[move_to_fld]);
-
-               if (pile_idx == components.size()-1)
-               {
-                  MMsg.addField(move_msg, Const.MsgType.MOVE)
-                      .addField(move_msg, Const.Fld.SRC).addToField(move_msg, id.bytes)
-                      .addField(move_msg, Const.Fld.DEST).addToField(move_msg, move_to_id.bytes)
-                      .addField(move_msg, card_id.bytes);
+                  if (pile_idx > 0 && ((Card)components.get(pile_idx-1)).flipAngle() == Const.Angle.FACE_DOWN)
+                     playlist.addSubcommand(Const.Fld.CARD_FLIP);
                }
                else
-               {
-                  MMsg.addField(move_msg, Const.MsgType.MULTIMOVE)
-                      .addField(move_msg, Const.Fld.SRC).addToField(move_msg, id.bytes)
-                      .addField(move_msg, Const.Fld.DEST).addToField(move_msg, move_to_id.bytes);
-
-                  for (int j=pile_idx; j < components.size(); j++)
-                  {
-                     MMsg.addField(move_msg, components.get(j).id.bytes);
-                  }
-               }
-               if (pile_idx > 0 && ((Card)components.get(pile_idx-1)).flipAngle() == Const.Angle.FACE_DOWN)
-                  MMsg.addField(move_msg, Const.Fld.CARD_FLIP);
-               move_rsp = sendMsg(move_msg);
-               releaseMsg(move_msg);
-               releaseMsg(move_rsp);
+                  playlist.addDest(new CardComponentId(rsp.bytes, rsp.fieldStartIdx[rsp_idx]));
             }
-            releaseMsg(rsp);
-            break;
          }
          releaseMsg(rsp);
       }

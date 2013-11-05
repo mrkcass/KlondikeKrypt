@@ -7,7 +7,7 @@ import java.util.Comparator;
 /**
  * Created by mark on 6/6/13.
  */
-public class Card extends CardColleague
+public class Card extends Playable
 {
    int gid = 0;
    public int positionInPile;
@@ -29,18 +29,23 @@ public class Card extends CardColleague
       init (_suit,_rank);
    }
 
-   Card (CardColleague _colleague, byte _suit, byte _rank)
+   Card (Playable _colleague, byte _suit, byte _rank)
    {
       super (_colleague);
 
       init (_suit,_rank);
    }
 
-   Card (CardColleague _colleague, int _suit, int _rank)
+   Card (Playable _colleague, int _suit, int _rank)
    {
       super (_colleague);
 
       init ((byte)_suit, (byte)_rank);
+   }
+
+   public static CardComponentId makeId (int _suit, int _rank)
+   {
+      return new CardComponentId(Const.MediatorType.CARD, (byte)_suit, (byte)_rank);
    }
 
    private void init (byte _suit, byte _rank)
@@ -107,7 +112,7 @@ public class Card extends CardColleague
       graphics.cardShow(gid, _show);
    }
 
-   @Override public CardColleague findTouched (float _posX, float _posY)
+   @Override public Playable findTouched (float _posX, float _posY)
    {
       //todo findTouched
       return null;
@@ -185,9 +190,9 @@ public class Card extends CardColleague
       return graphics.cardRotationAngle(gid, Const.Angle.AXIS_Z);
    }
 
-   public static class PositionInPileComparator implements Comparator<CardColleague>
+   public static class PositionInPileComparator implements Comparator<Playable>
    {
-      public int compare (CardColleague _c1, CardColleague _c2)
+      public int compare (Playable _c1, Playable _c2)
       {
          if (((Card)_c1).positionInPile < ((Card)_c2).positionInPile)
             return -1;

@@ -1,11 +1,9 @@
 package com.adapted.solitare;
 
-import java.util.ArrayList;
-
 /**
  * Created by mark on 6/18/13.
  */
-class WastePile extends CardColleagueComposite
+class WastePile extends PlayableComposite
 {
    
    private float posX, posY;
@@ -36,7 +34,7 @@ class WastePile extends CardColleagueComposite
       if (filter.type == Const.PlayFilterType.PFT_TOUCH_PLAYABLE)
       {
          tf = (PlaylistFilterTouch)filter;
-         CardColleague cc = findTouched(tf.x, tf.y);
+         Playable cc = findTouched(tf.x, tf.y);
          if (cc != null)
             list.AddPlay(cc, Const.PlayFilterType.PFT_TOUCH_PLAYABLE, id, id);
       }
@@ -50,7 +48,7 @@ class WastePile extends CardColleagueComposite
    }
 
    @Override
-   public CardColleague findTouched(float _posX, float _posY)
+   public Playable findTouched(float _posX, float _posY)
    {
       if (_posX >= posX && _posX <= posX + graphics.cardWidth())
       {
@@ -285,7 +283,7 @@ class WastePile extends CardColleagueComposite
          if (id.equals(msg.bytes, msg.fieldStartIdx[2]) && components.size() > 0)
          {
             response.addField(response, Const.Fld.RECYCLE_CARDS);
-            for (CardColleague c : components)
+            for (Playable c : components)
                response.addField(response, c.id.bytes);
          }
       }

@@ -12,6 +12,7 @@ package com.adapted.solitare;
 interface PlayerClient
 {
    public int GetPlaylist (Playlist list, PlaylistFilter filter);
+   public CardCommandReceiver GetCommandReceiver(CardComponentId id);
 }
 
 //======================================================================================================================

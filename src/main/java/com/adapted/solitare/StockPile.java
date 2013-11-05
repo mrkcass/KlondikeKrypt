@@ -3,7 +3,6 @@ package com.adapted.solitare;
 import android.annotation.TargetApi;
 import android.os.Build;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
@@ -11,7 +10,7 @@ import java.util.Random;
  * Created by mark on 6/6/13.
  */
 
-public class StockPile extends CardColleagueComposite
+public class StockPile extends PlayableComposite
 {
 
    //top of pile is element 0
@@ -113,7 +112,7 @@ public class StockPile extends CardColleagueComposite
       if (filter.type == Const.PlayFilterType.PFT_TOUCH_PLAYABLE)
       {
          tf = (PlaylistFilterTouch)filter;
-         CardColleague cc = findTouched(tf.x, tf.y);
+         Playable cc = findTouched(tf.x, tf.y);
          if (cc != null)
             list.AddPlay(cc, Const.PlayFilterType.PFT_TOUCH_PLAYABLE, id, id);
       }
@@ -126,7 +125,7 @@ public class StockPile extends CardColleagueComposite
       return 1;
    }
 
-   @Override public CardColleague findTouched (float _posX, float _posY)
+   @Override public Playable findTouched (float _posX, float _posY)
    {
       if (_posX >= posX && _posX <= posX + graphics.cardWidth())
       {

@@ -3,23 +3,21 @@ package com.adapted.solitare;
 import android.os.Bundle;
 import android.util.Log;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 
 /**
  * Created by mark on 6/8/13.
  */
 
-public class CardMediator  implements Mediator
+public class PlayableMediator implements Mediator
 {
-   private CardColleague components;
+   private Playable components;
    private CardCommandInvoker invoker = null;
    private GraphicsInterface graphics;
    private CardComponent dragComp = null;
    private CardMediatorMsgPool msgPool;
 
-   CardMediator (GraphicsInterface _graphics, CardCommandInvoker _invoker)
+   PlayableMediator(GraphicsInterface _graphics, CardCommandInvoker _invoker)
    {
       components = new RootPile(this, _graphics);
       invoker = _invoker;
@@ -135,9 +133,9 @@ public class CardMediator  implements Mediator
          return false;
    }
 
-   public CardColleague find (CardComponentId _id)
+   public Playable find (CardComponentId _id)
    {
-      return (CardColleague)components.find(_id);
+      return (Playable)components.find(_id);
    }
 
    private void createPortraitLayout ()
@@ -248,7 +246,7 @@ public class CardMediator  implements Mediator
       invoker.queueCommand(cc);
    }
 
-   public CardColleague GetRoot ()
+   public Playable GetRoot ()
    {
       return components;
    }

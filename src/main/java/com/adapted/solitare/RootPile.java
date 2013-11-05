@@ -1,11 +1,9 @@
 package com.adapted.solitare;
 
-import java.util.ArrayList;
-
 /**
  * Created by mark on 6/8/13.
  */
-public class RootPile extends CardColleagueComposite
+public class RootPile extends PlayableComposite
 {
    RootPile(Mediator _mediator, GraphicsInterface _graphics)
    {
@@ -13,7 +11,7 @@ public class RootPile extends CardColleagueComposite
 
       id = new CardComponentId(Const.MediatorType.ROOT, (byte)0, (byte)0);
 
-      CardColleague cc;
+      Playable cc;
 
       cc = new StockPile(_mediator, _graphics);
       components.add(cc);

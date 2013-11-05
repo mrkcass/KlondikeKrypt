@@ -94,6 +94,16 @@ class MMsg
       return true;
    }
 
+   public static void copy (MMsg _dst, MMsg _src)
+   {
+      for (int i=0; i < _src.len; i++)
+         _dst.bytes[i] = _src.bytes[i];
+      _dst.len = _src.len;
+      for (int i=0; i < _src.fieldCount; i++)
+         _dst.fieldStartIdx[i] = _src.fieldStartIdx[i];
+      _dst.fieldCount = _src.fieldCount;
+   }
+
    public static MMsg clear (MMsg _msg)
    {
       for (int i=0; i < _msg.len; i++)
@@ -222,6 +232,13 @@ class MMsg
       {
          _dst.bytes[_dst.len++] = _src.bytes[i];
       }
+      return _dst;
+   }
+
+   public static MMsg copyFields (MMsg _dst, MMsg _src, int _srcFieldFirst, int _srcFieldLast)
+   {
+      for (int i = _srcFieldFirst; i < _srcFieldLast && i < _src.fieldCount-1; i++)
+         MMsg.copyField(_dst, _src, i);
       return _dst;
    }
 

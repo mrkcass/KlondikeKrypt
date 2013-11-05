@@ -1,8 +1,6 @@
 package com.adapted.solitare;
 
-import android.os.Debug;
 import android.os.SystemClock;
-import android.util.Log;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -60,7 +58,7 @@ public class CardCommandInvoker implements GraphicsExecCommandsListener
       }
    }
 
-   public boolean restoreState (CardMediator _mediator)
+   public boolean restoreState (PlayableMediator _mediator)
    {
       return restoreGame(_mediator);
    }
@@ -180,7 +178,7 @@ public class CardCommandInvoker implements GraphicsExecCommandsListener
       }
    }
 
-   private boolean restoreGame (CardMediator _mediator)
+   private boolean restoreGame (PlayableMediator _mediator)
    {
       boolean fileRead = false;
       File f = new File(gameStateFileName);

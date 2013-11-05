@@ -10,7 +10,7 @@ import java.io.File;
 public class MainActivity extends Activity implements GraphicsSurfaceChangedListener
 {
    private GameGLSurface mGLView;
-   private CardMediator mediator = null;
+   private PlayableMediator mediator = null;
    private Bundle savedState = null;
    private CardCommandInvoker invoker = null;
    private  String gameStateFileName;
@@ -86,7 +86,7 @@ public class MainActivity extends Activity implements GraphicsSurfaceChangedList
       if (invoker != null)
          mGLView.getGraphicsInterface().delExecGraphicsCommandListener(invoker);
       invoker = new CardCommandInvoker(mGLView.getGraphicsInterface(), gameStateFileName);
-      mediator = new CardMediator(mGLView.getGraphicsInterface(), invoker);
+      mediator = new PlayableMediator(mGLView.getGraphicsInterface(), invoker);
 
       if (player != null)
          mGLView.InputListenerRemove((PlayerReal)player);

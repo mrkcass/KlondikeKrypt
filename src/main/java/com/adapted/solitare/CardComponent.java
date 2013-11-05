@@ -16,9 +16,9 @@ public interface CardComponent
    public void setOrientationLandscape ();
    public void setOrientationPortrait();
    public void setZorder (int _zorder);
-   public void setZorderOffset (int _offset);
+   //public void setZorderOffset (int _offset);
    public void show (boolean _show);
-   public int executeCommand (CardCommand _cmd);
+   //public int executeCommand (CardCommand _cmd);
 }
 
 class CardComponentId
