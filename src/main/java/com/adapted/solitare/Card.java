@@ -48,6 +48,16 @@ public class Card extends Playable
       return new CardComponentId(Const.MediatorType.CARD, (byte)_suit, (byte)_rank);
    }
 
+   public static byte IdSuit (CardComponentId id)
+   {
+      return id.bytes[1];
+   }
+
+   public static byte IdRank (CardComponentId id)
+   {
+      return id.bytes[2];
+   }
+
    private void init (byte _suit, byte _rank)
    {
       id = new CardComponentId(Const.MediatorType.CARD, _suit, _rank);
@@ -253,5 +263,10 @@ public class Card extends Playable
       RectF this_rect;
 
       return new RectF(posX(), posY(), posX()+width(), posY()+height());
+   }
+
+   public void addToPlaylist(Playlist playlist)
+   {
+      playlist.AddCard(suit, rank);
    }
 }

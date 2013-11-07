@@ -27,7 +27,7 @@ public class Playlist
       Clear (numPlays);
    }
 
-   void AddPlay (PlayerClient origin, int type, CardComponentId srcId, CardComponentId destId)
+   void AddPlay (PlayerClient origin, byte type, CardComponentId srcId, CardComponentId destId)
    {
       numPlays = 0;
       if (numPlays < MAX_PLAYS)
@@ -71,14 +71,6 @@ public class Playlist
       }
    }
 
-   void SetType (int type)
-   {
-      if (numPlays > 0 && numPlays <= MAX_PLAYS)
-      {
-         plays[numPlays-1].type = type;
-      }
-   }
-
    private void Clear (int range)
    {
       for (int i=0; i < range; i++)
@@ -112,7 +104,7 @@ class Play
 {
    static final int MAX_CARDS = 52;
    static final int MAX_DEST = 15;
-   int type;
+   byte type;
    PlayerClient origin;
    CardComponentId srcId;
    CardComponentId destId [];
@@ -188,10 +180,7 @@ class Play
    public CardCommand CreateCommand ()
    {
       MMsg cmd_msg = new MMsg();
-      if (numCards > 1)
-         MMsg.addField(cmd_msg, Const.Cmd.MULTIMOVE);
-      else
-         MMsg.addField(cmd_msg, Const.Cmd.MOVE);
+      MMsg.addField(cmd_msg, type);
       MMsg.addField(cmd_msg, Const.Fld.SRC).addToField(cmd_msg, srcId.bytes);
       MMsg.addField(cmd_msg, Const.Fld.DEST).addToField(cmd_msg, destId[selectedDest].bytes);
       if (subcommands.fieldCount > 0)

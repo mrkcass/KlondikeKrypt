@@ -40,6 +40,14 @@ public class StockPile extends PlayableComposite
       }
    }
 
+   public static boolean isClassId(CardComponentId id)
+   {
+      if (id.bytes[0] == Const.MediatorType.STOCK)
+         return true;
+      else
+         return false;
+   }
+
    ////message CARD_POSSIBLE_PLAY_OVERLAP
       //message
          //field 1 - <byte>GET_PARAM
@@ -137,47 +145,39 @@ public class StockPile extends PlayableComposite
       return null;
    }
 
-   @Override
-   public void processUserInput (int _type, int _param, float _posX, float _posY)
+   private void processTouch (int _type, int _param, float _posX, float _posY, Playlist playlist)
    {
-      if (_type == Const.InputType.TOUCH)
+      if (components.size() > 0)
+         flipToWaste(playlist);
+      else
+         recycleWaste(playlist);
+   }
+
+   private void flipToWaste (Playlist playlist)
+   {
+      playlist.AddPlay(this, Const.Cmd.MOVE, id, Const.PILE_ID_WASTE);
+      Card c = (Card)components.get(0);
+      c.addToPlaylist(playlist);
+   }
+
+   private void recycleWaste (Playlist playlist)
+   {
+      MMsg response;
+      MMsg msg = acquireMsg();
+
+      MMsg.addField(msg, Const.MsgType.GET_PARAM);
+      MMsg.addField(msg, Const.Fld.RECYCLE_CARDS);
+      MMsg.addField(msg, Const.PILE_ID_WASTE.bytes);
+      response = sendMsg(msg);
+
+      if (response.fieldCount > 0)
       {
-         if (components.size() > 0)
-         {
-            MMsg msg = acquireMsg();
-            MMsg.addField(msg, Const.MsgType.MOVE)
-                    .addField(msg, Const.Fld.SRC).addToField(msg, id.bytes)
-                    .addField(msg, Const.Fld.DEST).addToField(msg, Const.PILE_ID_WASTE.bytes)
-                    .addField(msg, components.get(0).id.bytes);
-            MMsg response = sendMsg(msg);
-            releaseMsg(msg);
-            releaseMsg(response);
-         }
-         else
-         {
-            MMsg response;
-            MMsg msg = acquireMsg();
-
-            MMsg.addField(msg, Const.MsgType.GET_PARAM);
-            MMsg.addField(msg, Const.Fld.RECYCLE_CARDS);
-            MMsg.addField(msg, Const.PILE_ID_WASTE.bytes);
-            response = sendMsg(msg);
-
-            if (response.fieldCount > 0)
-            {
-               MMsg.clear(msg);
-               MMsg.addField(msg, Const.MsgType.RECYCLE_WASTE);
-               MMsg.addField(msg, Const.Fld.SRC).addToField(msg, Const.PILE_ID_WASTE.bytes);
-               MMsg.addField(msg, Const.Fld.DEST).addToField(msg, id.bytes);
-               for (int i=1; i < response.fieldCount; i++)
-                  MMsg.copyField(msg, response, i);
-               releaseMsg(response);
-               response = sendMsg(msg);
-            }
-            releaseMsg(response);
-            releaseMsg(msg);
-         }
+         playlist.AddPlay(this, Const.Cmd.RECYCLE_WASTE, Const.PILE_ID_WASTE, id);
+         for (int i=1; i < response.fieldCount; i++)
+            playlist.AddCard(MMsg.subfieldByte(response,i,1), MMsg.subfieldByte(response,i,2));
       }
+      releaseMsg(response);
+      releaseMsg(msg);
    }
 
    @Override

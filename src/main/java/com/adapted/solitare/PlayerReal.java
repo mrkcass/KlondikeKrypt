@@ -62,8 +62,12 @@ public class PlayerReal extends Player implements UserInputListener
       if (playlist.numPlays > 0)
       {
          CardComponentId play_src_id = playlist.plays[0].srcId;
-         if (Tableau.isTableauId(play_src_id))
+         if (Tableau.isClassId(play_src_id))
             playFromTableau();
+         else if (WastePile.isClassId(play_src_id))
+            playFromWaste ();
+         else if (StockPile.isClassId(play_src_id))
+            playFromStock ();
       }
    }
 
@@ -84,7 +88,7 @@ public class PlayerReal extends Player implements UserInputListener
          Play play = playlist.plays[play_idx];
          for (int idx=0; idx < play.numDest; idx++)
          {
-            if (Tableau.isTableauId(play.destId[idx]))
+            if (Tableau.isClassId(play.destId[idx]))
             {
                int tindex = Tableau.indexFromId(play.destId[idx]);
                if (tindex < this_tab_index && tindex > next_least_tab_idx)
@@ -115,7 +119,6 @@ public class PlayerReal extends Player implements UserInputListener
                }
             }
          }
-
 
          int move_to_fld = -1;
          if (play.cards[0].rank == Const.Rank.KING && foundation_fld == -1)

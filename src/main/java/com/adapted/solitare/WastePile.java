@@ -17,6 +17,14 @@ class WastePile extends PlayableComposite
       id = new CardComponentId(Const.MediatorType.WASTE, (byte) 0, (byte) 0);
    }
 
+   public static boolean isClassId(CardComponentId id)
+   {
+      if (id.bytes[0] == Const.MediatorType.WASTE)
+         return true;
+      else
+         return false;
+   }
+
    @Override
    public void moveTo(float _x, float _y)
    {

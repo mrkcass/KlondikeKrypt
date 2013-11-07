@@ -142,9 +142,9 @@ public final class Const
 
    public static class PlayFilterType
    {
-      static final int PFT_UNDEFINED = 0;
-      static final int PFT_TOUCH_PLAYABLE = 1;
-      static final int PFT_TOUCH = 2;
+      static final byte PFT_UNDEFINED = 0;
+      static final byte PFT_TOUCH_PLAYABLE = 1;
+      static final byte PFT_TOUCH = 2;
    }
 
    public static final CardAnimStrategyNull NullAnimStrategy = new CardAnimStrategyNull();

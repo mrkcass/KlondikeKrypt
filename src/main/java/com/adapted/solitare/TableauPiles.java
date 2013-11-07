@@ -308,7 +308,7 @@ class Tableau extends PlayableComposite
       return id.bytes[1];
    }
 
-   public static boolean isTableauId (CardComponentId id)
+   public static boolean isClassId(CardComponentId id)
    {
       if (id.bytes[0] == Const.MediatorType.TABLEAU)
          return true;
@@ -636,9 +636,13 @@ class Tableau extends PlayableComposite
          {
             if (tf.touchType == Const.InputType.TOUCH)
                processTouch (list);
+            else if (tf.touchType == Const.InputType.DRAG_START && dragCard == null)
+               processDragStart (tf.touchParam, tf.x, tf.y);
+            else if (tf.touchType == Const.InputType.DRAG && dragCard != null)
+               processDrag (tf.touchParam, tf.x, tf.y);
+            else if (tf.touchType == Const.InputType.DRAG_END && dragCard != null)
+               processDragEnd (tf.touchParam, tf.x, tf.y, list);
          }
-         else
-            processUserInput(tf.touchType, tf.touchParam, tf.x, tf.y);
       }
 
       return 1;
@@ -664,20 +668,6 @@ class Tableau extends PlayableComposite
          return this;
       else
          return null;
-   }
-
-   @Override
-   public void processUserInput (int _type, int _param, float _posX, float _posY)
-   {
-      if (components.size() > 0)
-      {
-         if (_type == Const.InputType.DRAG_START && dragCard == null)
-            processDragStart (_param, _posX, _posY);
-         else if (_type == Const.InputType.DRAG && dragCard != null)
-            processDrag (_param, _posX, _posY);
-         else if (_type == Const.InputType.DRAG_END && dragCard != null)
-            processDragEnd (_param, _posX, _posY);
-      }
    }
 
    private void processTouch (Playlist playlist)
@@ -709,7 +699,12 @@ class Tableau extends PlayableComposite
             {
                if (rsp_idx == 1)
                {
-                  playlist.AddPlay(this, 1, id,  new CardComponentId(rsp.bytes, rsp.fieldStartIdx[rsp_idx]));
+                  byte command;
+                  if (pile_idx+1 == components.size())
+                     command = Const.Cmd.MOVE;
+                  else
+                     command = Const.Cmd.MULTIMOVE;
+                  playlist.AddPlay(this, command, id,  new CardComponentId(rsp.bytes, rsp.fieldStartIdx[rsp_idx]));
                   for (int card_idx = pile_idx; card_idx < components.size(); card_idx++)
                   {
                      Card card = (Card)components.get(card_idx);
@@ -819,7 +814,7 @@ class Tableau extends PlayableComposite
       }
    }
 
-   void processDragEnd (int _param, float _posX, float _posY)
+   void processDragEnd (int _param, float _posX, float _posY, Playlist playlist)
    {
       boolean cancel = true;
 
@@ -851,18 +846,15 @@ class Tableau extends PlayableComposite
             }
             if (max_overlap > 0)
             {
-               MMsg move_msg = acquireMsg();
-               MMsg.addField(move_msg, Const.MsgType.MULTIMOVE);
-               MMsg.addField(move_msg, Const.Fld.DEST).addToField(move_msg, max_overlap_id.bytes);
-               MMsg.addField(move_msg, Const.Fld.SRC).addToField(move_msg, id.bytes);
-               dragCard.scale(1.0f);
-               for (int j=dragCard.positionInPile; j < components.size(); j++)
-                  MMsg.addField(move_msg, components.get(j).id.bytes);
+               playlist.AddPlay(this, Const.Cmd.MULTIMOVE, id, max_overlap_id);
+               for (int card_idx=dragCard.positionInPile; card_idx < components.size(); card_idx++)
+               {
+                  Card card = (Card)components.get(card_idx);
+                  playlist.AddCard(card.suit, card.rank);
+               }
                if (dragCard.positionInPile > 0 && ((Card)components.get(dragCard.positionInPile-1)).flipAngle() == Const.Angle.FACE_DOWN)
-                  MMsg.addField(move_msg, Const.Fld.CARD_FLIP);
-               releaseMsg(resp);
-               resp = sendMsg(move_msg);
-               releaseMsg(move_msg);
+                  playlist.addSubcommand(Const.Fld.CARD_FLIP);
+
                cancel = false;
             }
          }
